@@ -3,6 +3,7 @@
 #include <IsdReader.h>
 
 #include <csm/Isd.h>
+#include <csm/RasterGM.h>
 
 #include <gtest/gtest.h>
 
@@ -83,7 +84,7 @@ TEST_F(MdisNacSensorModelTest, imageToGround1) {
   std::string modelName = MdisNacSensorModel::_SENSOR_MODEL_NAME;
   csm::Model *validModel = mdisPlugin.constructModelFromISD(*isd, modelName);
   // We could static_cast, but may be hard to debug if it doesn't correctly cast.
-  MdisNacSensorModel *mdisModel = dynamic_cast<MdisNacSensorModel *>(validModel);
+  csm::RasterGM *mdisModel = dynamic_cast<MdisNacSensorModel *>(validModel);
   
   // Fatal failure if the downcast doesn't work
   if (!mdisModel) {
@@ -91,13 +92,34 @@ TEST_F(MdisNacSensorModelTest, imageToGround1) {
   }
   
   csm::EcefCoord xyz = mdisModel->imageToGround(point, height);
-  double truth[] = { 1132.18*1000, -1597.75*1000, 1455.66*1000 };
-  EXPECT_EQ(truth[0], xyz.x);
-  EXPECT_EQ(truth[1], xyz.y);
-  EXPECT_EQ(truth[2], xyz.z);
+  double x {1132.18*1000};
+  double y {-1597.75*1000};
+  double z {1455.66*1000 };
+  EXPECT_EQ(x, xyz.x);
+  EXPECT_EQ(y, xyz.y);
+  EXPECT_EQ(z, xyz.z);
   
   // Remove the memory we took ownership of.
   delete mdisModel;
+}
+
+
+// Tests the groundToImage() method (see imageToGround1 test)
+TEST_F(MdisNacSensorModelTest, groundToImage1) {
+  if (!isd) {
+    FAIL() << "Could not create isd from file: " << dataFile;
+  }
+  std::string modelName = MdisNacSensorModel::_SENSOR_MODEL_NAME;
+  csm::Model *validModel = mdisPlugin.constructModelFromISD(*isd, modelName);
+  csm::RasterGM *mdisModel = dynamic_cast<MdisNacSensorModel *>(validModel);
+  if (!mdisModel) {
+    FAIL() << "Could not downcast Model* to MdisNacSensorModel*.";
+  }
+  csm::EcefCoord xyz {1132.18*1000, -1597.75*1000, 1455.66*1000};
+  csm::ImageCoord point = mdisModel->groundToImage(xyz);
+  double sample {512.0}, line {512.0};
+  EXPECT_EQ(line, point.line);
+  EXPECT_EQ(sample, point.samp);
 }
 
 
