@@ -42,6 +42,7 @@ class MdisNacSensorModelTest : public ::testing::Test {
     static void SetUpTestCase() {
       if (g_dataPath != "") {
         dataFile = g_dataPath + "/EN1007907102M.json";
+        dataFile = g_dataPath + "/CW1071364100B_IU_5.json";
         std::cout << "dataFile: " << dataFile << std::endl;
       }
       isd = readISD(dataFile);
@@ -55,7 +56,7 @@ class MdisNacSensorModelTest : public ::testing::Test {
         return;
       }
       
-      // printISD(*isd);
+      printISD(*isd);
       
       // Create a model from the ISD so we can test a valid image.
       std::string modelName = MdisNacSensorModel::_SENSOR_MODEL_NAME;

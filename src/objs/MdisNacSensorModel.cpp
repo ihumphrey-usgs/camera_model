@@ -319,8 +319,8 @@ csm::ImageCoord MdisNacSensorModel::groundToImage(const csm::EcefCoord &groundPt
 
 
   // Convert focal plane mm to pixels
-  double pixelX =  distortedFocalPlaneX * (1.0 / m_transX[1]);
-  double pixelY =  distortedFocalPlaneY * (1.0 / m_transY[2]);
+  double pixelX =  m_iTransS[0] + m_iTransS[1] * distortedFocalPlaneX + m_iTransS[2] * distortedFocalPlaneX;
+  double pixelY =  m_iTransL[0] + m_iTransL[1] * distortedFocalPlaneY + m_iTransL[2] * distortedFocalPlaneY;
   
   // Convert pixels to line,sample
   double sample = pixelX + m_ccdCenter - 0.5;
